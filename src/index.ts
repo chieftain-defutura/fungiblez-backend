@@ -12,6 +12,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1/users", router.userRouter);
+app.use("/api/v1/marketplace", router.marketplaceRouter);
 
 app.get("/", async (req, res) => {
   res.send("WELCOME TO DEHUSTLE API");
