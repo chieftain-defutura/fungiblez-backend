@@ -28,6 +28,14 @@ export const getMarketplace = async (req: Request, res: Response) => {
 
 export const createMarketplace = async (req: Request, res: Response) => {
   try {
+    // const userAddress = req.body.userAddress;
+    // const userAddressData = await Marketplace.findOne({
+    //   userAddress: req.body.userAddress,
+    // });
+    // console.log(userAddress);
+    // console.log(userAddressData);
+    // if (userAddressData) {
+    // }
     const data = await Marketplace.create({ ...req.body });
     res.json(data);
   } catch (error) {
