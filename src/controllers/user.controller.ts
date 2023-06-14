@@ -28,15 +28,16 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const userAddress = req.body.userAddress;
+    const userAddress = req.body.userAddress.toLowerCase();
+
+    if (!userAddress) return;
     const isExistingUser = await userSchema.findOne({
-      userAddress,
+      userAddress: userAddress,
     });
-    if (isExistingUser)
-      return res
-        .status(500)
-        .json({ error: { message: "user is already registered" } });
-    const data = await userSchema.create({ ...req.body });
+
+    if (isExistingUser) return res.json(isExistingUser);
+
+    const data = await userSchema.create({ userAddress });
     res.json(data);
   } catch (error) {
     console.log(error);

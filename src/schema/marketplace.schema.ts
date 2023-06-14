@@ -23,7 +23,7 @@ const marketplaceSchema = new mongoose.Schema(
       amount: { type: Number },
       strategy: { type: String },
       currency: { type: String },
-      nonce: { type: String },
+      nonce: { type: Number },
       startTime: { type: Number },
       endTime: { type: Number },
       minPercentageToAsk: { type: Number },

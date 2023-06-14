@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Marketplace from "../schema/marketplace.schema";
+import User from "../schema/user.schema";
 
 export const getAllMarketplaces = async (req: Request, res: Response) => {
   try {
@@ -28,15 +29,27 @@ export const getMarketplace = async (req: Request, res: Response) => {
 
 export const createMarketplace = async (req: Request, res: Response) => {
   try {
-    // const userAddress = req.body.userAddress;
-    // const userAddressData = await Marketplace.findOne({
-    //   userAddress: req.body.userAddress,
-    // });
-    // console.log(userAddress);
-    // console.log(userAddressData);
-    // if (userAddressData) {
-    // }
+    const userAddress = req.body.userAddress.toLowerCase();
+
+    const userAddressData = await User.findOne({
+      userAddress: userAddress,
+    });
+    console.log(userAddressData);
+    if (!userAddressData)
+      return res
+        .status(500)
+        .json({ error: { message: "something went wrong" } });
+
+    const userNonce = await User.findOneAndUpdate(
+      { userAddress },
+      { $inc: { nonce: 1 } },
+      { new: true }
+    );
+
+    console.log(userNonce);
+
     const data = await Marketplace.create({ ...req.body });
+    console.log(data);
     res.json(data);
   } catch (error) {
     console.log(error);
