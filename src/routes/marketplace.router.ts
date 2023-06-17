@@ -5,14 +5,16 @@ import {
   getAllMarketplaces,
   getMarketplace,
   updateMarketplace,
+  MakeOffer,
 } from "../controllers/marketplace.controller";
 
 const routes = express.Router();
 
 routes.get("/", getAllMarketplaces);
-routes.get("/:id", getMarketplace);
+routes.get("/:tokenId", getMarketplace);
 routes.post("/create", createMarketplace);
-routes.patch("/:id", updateMarketplace);
+routes.patch("/:tokenId", updateMarketplace);
+routes.patch("/offer/:tokenId", MakeOffer);
 routes.delete("/:id", deleteMarketplace);
 
 export default routes;
