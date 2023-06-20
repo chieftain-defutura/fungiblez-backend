@@ -11,7 +11,7 @@ import {
 const routes = express.Router();
 
 routes.get("/", getAllMarketplaces);
-routes.get("/:tokenId", getMarketplace);
+routes.get("/:collectionAddress/:tokenId", getMarketplace);
 routes.post("/create", createMarketplace);
 routes.patch("/:tokenId", updateMarketplace);
 routes.patch("/offer/:tokenId", MakeOffer);

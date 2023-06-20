@@ -14,7 +14,8 @@ export const getAllMarketplaces = async (req: Request, res: Response) => {
 export const getMarketplace = async (req: Request, res: Response) => {
   try {
     const tokenId = req.params.tokenId;
-    const data = await Marketplace.findOne({ tokenId });
+    const collectionAddress = req.params.collectionAddress;
+    const data = await Marketplace.findOne({ tokenId, collectionAddress });
 
     if (!data)
       return res.json({
