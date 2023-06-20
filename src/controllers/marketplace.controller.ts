@@ -31,9 +31,11 @@ export const getMarketplace = async (req: Request, res: Response) => {
 export const createMarketplace = async (req: Request, res: Response) => {
   try {
     const userAddress = req.body.userAddress.toLowerCase();
-
+    const tokenId = req.body.tokenId;
+    const collectionAddress = req.body.collectionAddress;
     const userAddressData = await User.findOne({
-      userAddress: userAddress,
+      tokenId: tokenId,
+      collectionAddress: collectionAddress,
     });
     console.log(userAddressData);
     if (!userAddressData)
