@@ -4,7 +4,6 @@ const marketplaceSchema = new mongoose.Schema(
   {
     userAddress: {
       type: String,
-      required: true,
     },
     status: {
       type: String,
@@ -15,7 +14,7 @@ const marketplaceSchema = new mongoose.Schema(
     tokenId: { type: String },
     collectionAddress: { type: String },
     ask: {
-      isOrderAsk: { type: Boolean, default: true },
+      isOrderAsk: { type: Boolean },
       signer: { type: String },
       collection: { type: String },
       price: { type: Number },
@@ -31,7 +30,7 @@ const marketplaceSchema = new mongoose.Schema(
     },
     offers: [
       {
-        isOrderAsk: { type: Boolean, default: false },
+        isOrderAsk: { type: Boolean },
         signer: { type: String },
         collection: { type: String },
         price: { type: Number },

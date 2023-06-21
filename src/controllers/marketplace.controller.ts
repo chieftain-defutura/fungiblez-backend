@@ -30,29 +30,34 @@ export const getMarketplace = async (req: Request, res: Response) => {
 
 export const createMarketplace = async (req: Request, res: Response) => {
   try {
+    const offers = req.body.offers;
     const userAddress = req.body.userAddress.toLowerCase();
     const tokenId = req.body.tokenId;
-    const collectionAddress = req.body.collectionAddress;
+    const collectionAddress = req.body.collectionAddress.toLowerCase();
     const userAddressData = await User.findOne({
+      userAddress: userAddress,
       tokenId: tokenId,
       collectionAddress: collectionAddress,
     });
     console.log(userAddressData);
     if (!userAddressData)
-      return res
-        .status(500)
-        .json({ error: { message: "something went wrong" } });
+      return res.status(500).json({ error: { message: "something is wrong" } });
 
     const userNonce = await User.findOneAndUpdate(
-      { userAddress },
-      { $inc: { nonce: 1 } },
+      { userAddress, tokenId, collectionAddress },
+      {
+        $inc: { nonce: 1 },
+        $push: {
+          offers: offers,
+        },
+      },
       { new: true }
     );
 
     console.log(userNonce);
 
     const data = await Marketplace.create({ ...req.body });
-    console.log(data);
+
     res.json(data);
   } catch (error) {
     console.log(error);
