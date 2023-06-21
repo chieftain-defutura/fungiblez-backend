@@ -30,7 +30,6 @@ export const getMarketplace = async (req: Request, res: Response) => {
 
 export const createMarketplace = async (req: Request, res: Response) => {
   try {
-    const offers = req.body.offers;
     const userAddress = req.body.userAddress.toLowerCase();
     const tokenId = req.body.tokenId;
     const ask = req.body.ask;
@@ -53,6 +52,7 @@ export const createMarketplace = async (req: Request, res: Response) => {
       const marketplaceUpdate = await Marketplace.findOneAndUpdate(
         { tokenId, collectionAddress },
         {
+          $inc: { nonce: 1 },
           $set: {
             ask: ask,
           },
