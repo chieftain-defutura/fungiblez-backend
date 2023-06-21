@@ -14,7 +14,7 @@ routes.get("/", getAllMarketplaces);
 routes.get("/:collectionAddress/:tokenId", getMarketplace);
 routes.post("/create", createMarketplace);
 routes.patch("/:tokenId", updateMarketplace);
-routes.patch("/offer/:tokenId", MakeOffer);
+routes.post("/makeoffer", MakeOffer);
 routes.delete("/:id", deleteMarketplace);
 
 export default routes;

@@ -33,6 +33,7 @@ export const createMarketplace = async (req: Request, res: Response) => {
     const offers = req.body.offers;
     const userAddress = req.body.userAddress.toLowerCase();
     const tokenId = req.body.tokenId;
+    const ask = req.body.ask;
     const collectionAddress = req.body.collectionAddress.toLowerCase();
     const userAddressData = await User.findOne({
       userAddress: userAddress,
@@ -43,18 +44,23 @@ export const createMarketplace = async (req: Request, res: Response) => {
     if (!userAddressData)
       return res.status(500).json({ error: { message: "something is wrong" } });
 
-    const userNonce = await User.findOneAndUpdate(
-      { userAddress, tokenId, collectionAddress },
-      {
-        $inc: { nonce: 1 },
-        $push: {
-          offers: offers,
-        },
-      },
-      { new: true }
-    );
+    const marketplaceData = await Marketplace.findOne({
+      tokenId: tokenId,
+      collectionAddress: collectionAddress,
+    });
 
-    console.log(userNonce);
+    if (marketplaceData) {
+      const marketplaceUpdate = await Marketplace.findOneAndUpdate(
+        { tokenId, collectionAddress },
+        {
+          $set: {
+            ask: ask,
+          },
+        },
+        { new: true }
+      );
+      return res.json(marketplaceUpdate);
+    }
 
     const data = await Marketplace.create({ ...req.body });
 
@@ -67,33 +73,50 @@ export const createMarketplace = async (req: Request, res: Response) => {
 
 export const MakeOffer = async (req: Request, res: Response) => {
   try {
-    const tokenId = req.params.tokenId;
-    const userAddress = req.body.userAddress.toLowerCase();
+    const userAddress = req.body.userAddress;
+    const tokenId = req.body.tokenId;
+    const collectionAddress = req.body.collectionAddress.toLowerCase();
     const offers = req.body.offers;
-    const usertoken = await Marketplace.findOne({
-      userAddress,
+    const usertoken = await User.findOne({
+      userAddress: userAddress,
+      tokenId: tokenId,
+      collectionAddress: collectionAddress,
     });
 
-    if (usertoken)
-      return res.json({ error: { message: "User already made offer" } });
-
-    const data = await Marketplace.findOneAndUpdate(
-      {
-        tokenId,
-      },
-
-      {
-        $inc: { nonce: 1 },
-        $push: {
-          offers: offers,
+    if (usertoken) {
+      console.log("offers", offers);
+      const userNonce = await Marketplace.findOneAndUpdate(
+        { tokenId, collectionAddress, userAddress },
+        {
+          $inc: { nonce: 1 },
+          $push: {
+            offers: offers,
+          },
         },
-      },
-      {
-        new: true,
-      }
-    );
+        { new: true }
+      );
 
-    res.json(data);
+      return res.json(userNonce);
+    }
+
+    const createOffer = await Marketplace.findOne({
+      tokenId: tokenId,
+      collectionAddress: collectionAddress,
+    });
+
+    if (!createOffer) {
+      const data = await Marketplace.create({
+        userAddress: "",
+        status: "pending",
+        tokenId: tokenId,
+        collectionAddress: collectionAddress,
+        ask: {},
+        offers: [offers],
+        orderHash: {},
+      });
+
+      return res.json(data);
+    }
   } catch (error) {
     res.status(500).json({ error: { message: "something went wrong" } });
   }
