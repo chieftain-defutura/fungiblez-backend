@@ -89,8 +89,6 @@ export const MakeOffer = async (req: Request, res: Response) => {
     const signer = req.body.offers.signer;
     const usertoken = await User.findOne({
       userAddress: userAddress,
-      tokenId: tokenId,
-      collectionAddress: collectionAddress,
     });
 
     if (usertoken) {
@@ -107,7 +105,6 @@ export const MakeOffer = async (req: Request, res: Response) => {
       const userNonce = await Marketplace.findOneAndUpdate(
         { tokenId, collectionAddress, userAddress },
         {
-          $inc: { nonce: 1 },
           $push: {
             offers: offers,
           },
