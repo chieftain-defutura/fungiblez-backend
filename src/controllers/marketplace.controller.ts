@@ -36,12 +36,21 @@ export const createMarketplace = async (req: Request, res: Response) => {
     const collectionAddress = req.body.collectionAddress.toLowerCase();
     const userAddressData = await User.findOne({
       userAddress: userAddress,
-      tokenId: tokenId,
-      collectionAddress: collectionAddress,
     });
     console.log(userAddressData);
     if (!userAddressData)
       return res.status(500).json({ error: { message: "something is wrong" } });
+
+    const usernonce = await User.findOneAndUpdate(
+      {
+        userAddress,
+      },
+      {
+        $inc: { nonce: 1 },
+      },
+      { new: true }
+    );
+    console.log(usernonce);
 
     const marketplaceData = await Marketplace.findOne({
       tokenId: tokenId,
@@ -49,16 +58,6 @@ export const createMarketplace = async (req: Request, res: Response) => {
     });
 
     if (marketplaceData) {
-      const usernonce = await User.findOneAndUpdate(
-        {
-          userAddress,
-        },
-        {
-          $inc: { nonce: 1 },
-        },
-        { new: true }
-      );
-      console.log(usernonce);
       const marketplaceUpdate = await Marketplace.findOneAndUpdate(
         { tokenId, collectionAddress },
         {
@@ -87,14 +86,15 @@ export const MakeOffer = async (req: Request, res: Response) => {
     const collectionAddress = req.body.collectionAddress.toLowerCase();
     const offers = req.body.offers;
     const signer = req.body.offers.signer;
+    console.log(signer);
     const usertoken = await User.findOne({
-      userAddress: userAddress,
+      userAddress: offers.signer,
     });
 
     if (usertoken) {
       const usernonce = await User.findOneAndUpdate(
         {
-          signer,
+          userAddress,
         },
         {
           $inc: { nonce: 1 },
@@ -102,8 +102,16 @@ export const MakeOffer = async (req: Request, res: Response) => {
         { new: true }
       );
       console.log(usernonce);
+    }
+
+    const isExisitingToken = await Marketplace.findOne({
+      tokenId: tokenId,
+      collectionAddress: collectionAddress,
+    });
+
+    if (isExisitingToken) {
       const userNonce = await Marketplace.findOneAndUpdate(
-        { tokenId, collectionAddress, userAddress },
+        { tokenId, collectionAddress },
         {
           $push: {
             offers: offers,
@@ -111,16 +119,10 @@ export const MakeOffer = async (req: Request, res: Response) => {
         },
         { new: true }
       );
-
       return res.json(userNonce);
     }
 
-    const createOffer = await Marketplace.findOne({
-      tokenId: tokenId,
-      collectionAddress: collectionAddress,
-    });
-
-    if (!createOffer) {
+    if (!isExisitingToken) {
       const data = await Marketplace.create({
         userAddress: "",
         status: "pending",

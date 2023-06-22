@@ -43,6 +43,9 @@ const marketplaceSchema = new mongoose.Schema(
         endTime: { type: Number },
         minPercentageToAsk: { type: Number },
         params: { type: String },
+        r: { type: String },
+        s: { type: String },
+        v: { type: String },
       },
     ],
     orderHash: {
