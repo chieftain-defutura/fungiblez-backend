@@ -49,10 +49,19 @@ export const createMarketplace = async (req: Request, res: Response) => {
     });
 
     if (marketplaceData) {
+      const usernonce = await User.findOneAndUpdate(
+        {
+          userAddress,
+        },
+        {
+          $inc: { nonce: 1 },
+        },
+        { new: true }
+      );
+      console.log(usernonce);
       const marketplaceUpdate = await Marketplace.findOneAndUpdate(
         { tokenId, collectionAddress },
         {
-          $inc: { nonce: 1 },
           $set: {
             ask: ask,
           },
@@ -77,6 +86,7 @@ export const MakeOffer = async (req: Request, res: Response) => {
     const tokenId = req.body.tokenId;
     const collectionAddress = req.body.collectionAddress.toLowerCase();
     const offers = req.body.offers;
+    const signer = req.body.offers.signer;
     const usertoken = await User.findOne({
       userAddress: userAddress,
       tokenId: tokenId,
@@ -84,7 +94,16 @@ export const MakeOffer = async (req: Request, res: Response) => {
     });
 
     if (usertoken) {
-      console.log("offers", offers);
+      const usernonce = await User.findOneAndUpdate(
+        {
+          signer,
+        },
+        {
+          $inc: { nonce: 1 },
+        },
+        { new: true }
+      );
+      console.log(usernonce);
       const userNonce = await Marketplace.findOneAndUpdate(
         { tokenId, collectionAddress, userAddress },
         {
